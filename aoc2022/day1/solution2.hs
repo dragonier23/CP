@@ -14,4 +14,4 @@ parse input = filter (\xs -> not(foldl (\acc x -> null x || acc) False xs)) . gr
 
 
 solution :: (Num b, Read b, Ord b) => [[String]] -> b
-solution xs = last . sort . map (sum . map read) $ xs
+solution xs = sum . take 3 . reverse . sort . map (sum . map read) $ xs
