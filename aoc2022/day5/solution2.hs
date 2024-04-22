@@ -36,7 +36,7 @@ parseMoves = map (\line ->
 
 solution :: [String] -> [(Int, Int, Int)] -> String
 solution stack moves = map head $ foldl (\acc (num, from, to) -> 
-    movement acc num from to (reverse (take num (acc !! from)))) stack moves
+    movement acc num from to (take num (acc !! from))) stack moves
 
 movement :: [String] -> Int -> Int -> Int -> String -> [String] 
 movement [] _ _ _ _ = []
