@@ -5,14 +5,14 @@ import Data.Char
 import Distribution.Parsec (parsecToken')
 
 main = do
-    handle <- openFile "test1.txt" ReadMode --"problemstatement.txt" ReadMode --
+    handle <- openFile "problemstatement.txt" ReadMode --"test1.txt" ReadMode --
     contents <- hGetContents handle
     let parsedContents = parse contents
-        horizontalVisible = map (\x -> product' (line . line' $ x) (reverse . line . line' . reverse $ x)) parsedContents  
-        --verticalVisible = transpose $ map (\x -> xOr (line x) (reverse . line . reverse $ x)) (transpose' parsedContents)
-        --visible = reconcile horizontalVisible verticalVisible
-        --answer = foldl (\acc x -> acc + sum x) 0 visible
-    print horizontalVisible --answer
+        horizontalVisible = map (\x -> product' (line x) (reverse . line . reverse $ x)) parsedContents  
+        verticalVisible = transpose $ map (\x -> product' (line x) (reverse . line . reverse $ x)) (transpose' parsedContents)
+        visible = reconcile horizontalVisible verticalVisible
+        answer = maximum . map maximum $ visible
+    print answer --visible --
     hClose handle
 
 --parsed :: String -> [Int]
@@ -24,12 +24,12 @@ transpose' ([]:_) = []
 transpose' x = map head x: transpose' (map tail x)
 
 line :: [Int] -> [Int]
-line xs = reverse (0 : (tail . reverse $ xs))
-
-line' :: [Int] -> [Int]
 --line (x:xs) = reverse . tail . foldl (\(largest:ys) curr -> if curr > largest then curr:1:ys else largest:0:ys) [x, 1] $ xs 
-line' [] = []
-line' (x:xs) = length (takeWhile (<x) xs) + 1 : line' xs
+line [] = []
+line (x:xs) = 
+    let dist = length (takeWhile (<x) xs)
+        viewingDist = if dist == length xs then dist else dist + 1 
+    in viewingDist : line xs
 
 product' :: [Int] -> [Int] -> [Int]
 product' [] _ = []
