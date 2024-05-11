@@ -15,7 +15,7 @@ main = do
         start = ((length (head parsedActions) - 1) - sx, (length parsedActions - 1) - sy)
         end = ((length (head parsedActions) - 1) - ex, (length parsedActions - 1) - ey)
         toVisit = sortBy (\(_, _, d1) (_, _, d2) -> compare d1 d2) $ substitute (foldl (\acc y -> map (\x -> (x, y, 9999999)) [0..(length . head $ parsedActions)] ++ acc ) [] [0..length parsedActions]) (0, 0) (-1)
-        answer = solution [] toVisit parsedActions end
+        answer = solution [] toVisit parsedActions (0, 0)
     print answer --toVisit
     hClose handle
 
