@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Use tuple-section" #-}
 import System.IO
 import Data.List
 import qualified Data.Set as Set
@@ -11,12 +9,11 @@ main = do
     contents <- hGetContents handle
     let parsedActions = parse contents
         (ex, ey) = parse' parsedActions 'E'
-        start = map (\x -> (0, x)) [0..length parsedActions]
         end = ((length (head parsedActions) - 1) - ex, (length parsedActions - 1) - ey)
-        toVisit = map (\x -> sortBy (\(_, _, d1) (_, _, d2) -> compare d1 d2) $ substitute (foldl (\acc y -> map (\x -> (x, y, 9999999)) [0..(length . head $ parsedActions)] ++ acc ) [] [0..length parsedActions]) x (-1)) start
+        toVisit = sortBy (\(_, _, d1) (_, _, d2) -> compare d1 d2) $ substitute (foldl (\acc y -> map (\x -> (x, y, 9999999)) [0..((length . head $ parsedActions) - 1)] ++ acc ) [] [0..length parsedActions - 1]) end (-1)
         --answer = solution' [] toVisit parsedActions end (59, 20, 340) --(58, 20)
-        answer = minimum . map (\x -> solution [] x parsedActions end) $ toVisit
-    print answer --
+        answer = solution [] toVisit parsedActions
+    print answer --toVisit --
     hClose handle
 
 parse :: String -> [String]
@@ -36,21 +33,21 @@ parse' ((x:xs):ys) toFind
 -- the updated node, then sort it 
 -- so we will use a fold?
 
-solution :: [(Int, Int)] -> [(Int, Int, Int)] -> [String] -> (Int, Int) -> Int
-solution _ [] _ _ = -1
-solution visited ((x, y, dist):xs) elevationMap (ex, ey)
-    | x == ex && y == ey = dist
-    | otherwise = solution ((x, y):visited) updatedxs elevationMap (ex, ey)
-    where updatedxs = sortBy (\(_, _, d1) (_, _, d2) -> compare d1 d2) $ solution' visited xs elevationMap (ex, ey) (x, y, dist)
+solution :: [(Int, Int)] -> [(Int, Int, Int)] -> [String] -> Int
+solution _ [] _ = -1
+solution visited ((x, y, dist):xs) elevationMap
+    | x == 0 = dist
+    | otherwise = solution ((x, y):visited) updatedxs elevationMap
+    where updatedxs = sortBy (\(_, _, d1) (_, _, d2) -> compare d1 d2) $ solution' visited xs elevationMap (x, y, dist)
 
 -- updatedxs needs to be sorted too 
 -- input is: visited, tovisit, elevationmap, endloc, currloc + dist
-solution' :: [(Int, Int)] -> [(Int, Int, Int)] -> [String] -> (Int, Int) -> (Int, Int, Int) -> [(Int, Int, Int)]
-solution' visited toVisit elevationMap (ex, ey) (cx, cy, dist) =
+solution' :: [(Int, Int)] -> [(Int, Int, Int)] -> [String] -> (Int, Int, Int) -> [(Int, Int, Int)]
+solution' visited toVisit elevationMap (cx, cy, dist) =
     let adjacentNodes = filter (`notElem` visited) . filter (\(ax, ay) -> ax >= 0 && ax < (length . head $ elevationMap) && ay >= 0 && ay < length elevationMap) . map (\(x, y) -> (cx + x, cy + y)) $ [(1, 0), (-1, 0), (0, 1), (0, -1)]
         visitableAdjacentNodes = filter (\(x , y) -> let currLetter = (elevationMap !! cy) !! cx
                                                          adjLetter = (elevationMap !! y) !! x
-                                                     in adjLetter `elem` ['a'..succ currLetter] || (adjLetter == 'E' && (currLetter == 'z' || currLetter == 'y')) || (currLetter == 'S' && (adjLetter == 'a' || adjLetter == 'b'))) adjacentNodes
+                                                     in if currLetter == 'E' then adjLetter == 'z' || adjLetter == 'y' else adjLetter `notElem` ['a'..pred . pred $ currLetter] || (adjLetter == 'S' && (currLetter == 'a' || currLetter == 'b'))) adjacentNodes
     in foldl (\acc x -> substitute acc x dist) toVisit visitableAdjacentNodes
 
 substitute :: [(Int, Int, Int)] -> (Int, Int) -> Int -> [(Int, Int, Int)]

@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Use tuple-section" #-}
 import System.IO
 import Data.List
 import qualified Data.Set as Set
@@ -14,10 +12,10 @@ main = do
         (ex, ey) = parse' parsedActions 'E'
         start = ((length (head parsedActions) - 1) - sx, (length parsedActions - 1) - sy)
         end = ((length (head parsedActions) - 1) - ex, (length parsedActions - 1) - ey)
-        toVisit = sortBy (\(_, _, d1) (_, _, d2) -> compare d1 d2) $ substitute (foldl (\acc y -> map (\x -> (x, y, 9999999)) [0..(length . head $ parsedActions)] ++ acc ) [] [0..length parsedActions]) (0, 0) (-1)
+        toVisit = sortBy (\(_, _, d1) (_, _, d2) -> compare d1 d2) $ substitute (foldl (\acc y -> map (\x -> (x, y, 9999999)) [0..((length . head $ parsedActions) - 1)] ++ acc ) [] [0..length parsedActions - 1]) start (-1)
         --answer = solution' [] toVisit parsedActions end (59, 20, 340) --(58, 20)
         answer = solution [] toVisit parsedActions end
-    print answer --
+    print answer --toVisit --
     hClose handle
 
 parse :: String -> [String]
