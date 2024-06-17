@@ -9,9 +9,9 @@ main = do
     handle <- openFile "problemstatement.txt" ReadMode
     contents <- hGetContents handle
     let parsed = parse contents
-        max = findMax parsed
+        max = findMax parsed + 2
         answer = solution parsed max 
-        ans = Set.size answer - Set.size parsed
+        ans = Set.size answer - Set.size parsed + 1
     print ans --parsed -- max --answer -- 
     hClose handle
 
@@ -39,7 +39,7 @@ findMax = foldl (\acc (x, y) -> max y acc) 0
 -- simuilate motion until there is something that escapes
 solution :: Set.Set (Int, Int) -> Int -> Set.Set (Int, Int)
 solution occupied max
-    | finalPos == (-1, -1) = occupied
+    | finalPos == (500, 0) = occupied
     | otherwise = solution (Set.insert finalPos occupied) max
     where finalPos = falling occupied (500, 0) max
 
@@ -49,7 +49,7 @@ solution occupied max
 -- if the y then exceeds the limit, we return some sort of code - falling to infinity
 falling :: Set.Set (Int, Int) -> (Int, Int) -> Int -> (Int, Int)
 falling occupied (x, y) max
-    | y+1 > max = (-1, -1)
+    | y+1 == max = (x, y)
     | (x, y+1) `Set.notMember` occupied = falling occupied (x, y+1) max
     | (x-1, y+1) `Set.notMember` occupied = falling occupied (x-1, y+1) max
     | (x+1, y+1) `Set.notMember` occupied = falling occupied (x+1, y+1) max
