@@ -54,7 +54,7 @@ int main() {
     //strategy: take in the list, then sort it --> subsequently multiple each by its index + 1
     vector<vector<string>> hands;
     while (getline(readFile, line)){ //this line reads each line, and stores it in the variable line
-        vector<string> hand ; 
+        vector<string> hand; 
         string tmp;
         stringstream linestream(line);
         while (getline(linestream, tmp, ' ')){
