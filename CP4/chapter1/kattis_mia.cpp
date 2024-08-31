@@ -7,6 +7,11 @@
 
 using namespace std;
 
+typedef long long ll; 
+typedef pair<int, int> ii; 
+typedef vector<ii> vii;
+typedef vector<int> vi;
+
 int main() {
   int tmp, s0, s1, r0, r1;
   while (scanf("%d %d %d %d", &s0, &s1, &r0, &r1), (s1 || s0 || r0 || r1)){
